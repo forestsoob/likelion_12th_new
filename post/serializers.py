@@ -2,18 +2,14 @@ from rest_framework import serializers
 from .models import *
 
 class PostSerializer(serializers.ModelSerializer):
-    id = serializers.CharField(read_only=True)
-    created_at = serializers.CharField(read_only=True)
-    updated_at = serializers.CharField(read_only=True)
-
-
+    tag = serializers.SerializerMethodField()
+    image = serializers.ImageField(use_url=True, required=False)
     comments = serializers.SerializerMethodField(read_only=True)
 
     def get_comments(self, instance):
         serializer = CommentSerializer(instance.comments, many=True)
         return serializer.data
     
-    tag = serializers.SerializerMethodField()
     def get_tag(self, instance):
         tags = instance.tag.all()
         return [tag.name for tag in tags]
@@ -21,6 +17,12 @@ class PostSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
         fields = '__all__'
+        read_only_fields = [
+            "id",
+            "created_at",
+            "updated_at",
+            "comments"
+        ]
 
 
 class CommentSerializer(serializers.ModelSerializer):

@@ -11,7 +11,11 @@ from .serializers import PostSerializer, CommentSerializer, PostListSerializer
 # Create your views here.
 class PostViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.all()
-    serializer_class = PostSerializer
+    
+    def get_serializer_class(self):
+        if self.action == "list":
+            return PostListSerializer
+        return PostSerializer
 
     def create(self,request):
         serializer = self.get_serializer(data=request.data)
@@ -54,11 +58,16 @@ class PostCommentViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
 
-    def list(self, request, post_id=None):
-        post = get_object_or_404(Post, id = post_id)
-        queryset = self.filter_queryset(self.get_queryset().filter(post=post))
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data)
+    def get_queryset(self):
+        post = self.kwargs.get("post_id")
+        queryset = Comment.objects.filter(post_id=post)
+        return queryset
+
+    #def list(self, request, post_id=None):
+    #    post = get_object_or_404(Post, id = post_id)
+    #    queryset = self.filter_queryset(self.get_queryset().filter(post=post))
+    #    serializer = self.get_serializer(queryset, many=True)
+    #    return Response(serializer.data)
     
     def create(self, request, post_id=None):
         post = get_object_or_404(Post, id = post_id)
