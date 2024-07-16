@@ -64,13 +64,22 @@ class PostViewSet(viewsets.ModelViewSet):
     @action(methods=["POST"], detail=True, permission_classes=[IsAuthenticated])
     def like(self, request, pk=None):
         post = self.get_object()
-        post.likes += 1
+        user = request.user
+
+        if user in post.liked_users.all():
+            post.likes -= 1
+            post.liked_users.remove(user)
+            status = "post unliked"
+        else:
+            post.likes += 1
+            post.liked_users.add(user)
+            status = "post liked"
         post.save(update_fields=["likes"])
         return Response({"status": "post liked", "likes": post.likes})
 
     @action(methods=["GET"], detail=False)
     def top_liked(self, request):
-        top_posts = Post.objects.order_by('-likes')[:3]
+        top_posts = Post.objects.order_by('-like_count')[:3]
         serializer = PostListSerializer(top_posts, many=True)
         return Response(serializer.data)
     
