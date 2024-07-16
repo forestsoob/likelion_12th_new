@@ -61,21 +61,20 @@ class PostViewSet(viewsets.ModelViewSet):
         test_post.save(update_fields=["click_num"])
         return Response()
     
-    @action(methods=["POST"], detail=True, permission_classes=[IsAuthenticated])
+    @action(methods=['POST'], detail=True)
     def like(self, request, pk=None):
         post = self.get_object()
         user = request.user
 
-        if user in post.liked_users.all():
-            post.likes -= 1
-            post.liked_users.remove(user)
-            status = "post unliked"
+        if user in post.like.all():
+            post.like.remove(user)
         else:
-            post.likes += 1
-            post.liked_users.add(user)
-            status = "post liked"
-        post.save(update_fields=["likes"])
-        return Response({"status": "post liked", "likes": post.likes})
+            post.like.add(user)
+
+        post.like_count = post.like.count()
+        post.save()
+
+        return Response({'like_count': post.like_count})
 
     @action(methods=["GET"], detail=False)
     def top_liked(self, request):

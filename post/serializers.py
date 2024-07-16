@@ -22,7 +22,7 @@ class PostSerializer(serializers.ModelSerializer):
             "created_at",
             "updated_at",
             "comments",
-            "likes",
+            "like",
         ]
 
 
@@ -60,6 +60,6 @@ class PostListSerializer(serializers.ModelSerializer):
             "image",
             "comments_cnt",
             "tag",
-            "likes",
+            "like",
         ]
         read_only_fields = ["id", "created_at", "updated_at", "comments_cnt", "likes"]
