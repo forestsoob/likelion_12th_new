@@ -22,8 +22,8 @@ class PostViewSet(viewsets.ModelViewSet):
         return PostSerializer
     
     def get_permissions(self):
-        if self.action in ["update", "destroy", "partial_update"]:
-            return [IsAdminUser()]
+        if self.action in ["update", "create", "destroy", "partial_update"]:
+            return [IsOwnerOrReadOnly()]
         return []
 
     def create(self,request):
@@ -60,6 +60,19 @@ class PostViewSet(viewsets.ModelViewSet):
         test_post.click_num += 1
         test_post.save(update_fields=["click_num"])
         return Response()
+    
+    @action(methods=["POST"], detail=True, permission_classes=[IsAuthenticated])
+    def like(self, request, pk=None):
+        post = self.get_object()
+        post.likes += 1
+        post.save(update_fields=["likes"])
+        return Response({"status": "post liked", "likes": post.likes})
+
+    @action(methods=["GET"], detail=False)
+    def top_liked(self, request):
+        top_posts = Post.objects.order_by('-likes')[:3]
+        serializer = PostListSerializer(top_posts, many=True)
+        return Response(serializer.data)
     
 
 

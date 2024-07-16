@@ -53,11 +53,12 @@ class PostListSerializer(serializers.ModelSerializer):
         model = Post
         fields = [
             "id",
-            "name",
+            "title",
             "created_at",
             "updated_at",
             "image",
             "comments_cnt",
-            "tag"
+            "tag",
+            "likes",
         ]
-        read_only_fields = ["id", "created_at", "updated_at", "comments_cnt"]
+        read_only_fields = ["id", "created_at", "updated_at", "comments_cnt", "likes"]
