@@ -6,6 +6,8 @@ class Tag(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=50)
 
+def image_upload_path(instance, filename):
+    return f'{instance.pk}/{filename}'
 
 class Post(models.Model):
     id = models.AutoField(primary_key=True)
@@ -13,6 +15,7 @@ class Post(models.Model):
     content = models.TextField(max_length=200)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    image = models.ImageField(upload_to=image_upload_path, blank=True, null=True)
     tag = models.ManyToManyField(Tag, blank=True)
 
 class Comment(models.Model):
